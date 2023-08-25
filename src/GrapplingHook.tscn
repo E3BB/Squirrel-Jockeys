@@ -8,9 +8,10 @@
 size = Vector2(5, 8)
 
 [node name="GrapplingHook" type="AnimatableBody2D" node_paths=PackedStringArray("line2d")]
+sync_to_physics = false
 script = ExtResource("2_j3vli")
 line2d = NodePath("Rope")
-speed = 0.0
+speed = 512.0
 
 [node name="GrapplingHookSprite" type="Sprite2D" parent="."]
 texture = ExtResource("1_3nej4")

@@ -24,8 +24,12 @@ func _physics_process(delta):
 	
 	attatched_to_object = false if collisionData == null else true
 	
-	vel = Vector2(speed, 0) * get_transform().x * delta if attatched_to_object == false else Vector2.ZERO
+	vel = Vector2(speed, 0).rotated($GrapplingHookSprite.rotation) * delta if attatched_to_object == false else Vector2.ZERO
 	
-	collisionData = move_and_collide(vel)
+	if attatched_to_object == true:
+		player.swingOnGrapplingHook()
+	else:
+		collisionData = move_and_collide(vel)
+		player.grapplingHookLength = (position - player.position).length()
 	
 	pass

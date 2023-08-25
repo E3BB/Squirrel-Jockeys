@@ -19,10 +19,18 @@ extends MovableBase2D
 
 @export var jumps : int = 1
 
+@export_range(0, 90) var floor_max_angle : float = 45
+
 # ** Private Variables **
 var inputDirection : Vector2
 
 var jumpsLeft : int = 0
+
+@export var is_on_floor : bool
+
+@export var is_on_wall : bool
+
+@export var is_on_ceiling : bool
 
 var collisionData : KinematicCollision2D
 
@@ -40,20 +48,13 @@ func _ready():
 
 func _physics_process(delta):
 	
-	if Input.is_action_just_pressed("reset_player_position"):
-		vel = Vector2.ZERO
-		position = Vector2.ZERO
-	
-	if Input.is_action_just_pressed("shoot"):
-		shootGrapplingHook(grapplingHookContainer, grapplingHookSpawnpoint, grapplingHookScene)
+	pointAndShootGrapplingHook(grapplingHookContainer, grapplingHookSpawnpoint, grapplingHookScene)
 	
 	movePlayer(delta)
 	
 	collisionData = move_and_collide(vel)
 	
 	collisionChecks(delta)
-	
-	swingOnGrapplingHook(delta)
 	
 	pass
 
@@ -63,6 +64,13 @@ func _physics_process(delta):
 
 # ** My Functions **
 func movePlayer(delta):
+	
+	# Reset player position
+	if Input.is_action_just_pressed("reset_player_position"):
+		vel = Vector2.ZERO
+		position = Vector2.ZERO
+		if currentGrapplingHook != null:
+			currentGrapplingHook.queue_free()
 	
 	# Register input direction
 	inputDirection.x = Input.get_action_strength(rightInput) - Input.get_action_strength(leftInput)
@@ -79,8 +87,8 @@ func movePlayer(delta):
 	if inputDirection.y < 0 && vel.y > 0 or inputDirection.y > 0 && vel.y < 0:
 		inputDirection.y *= 16
 	
-	# If gravity_enabled movement (Only applies if gravity_enabled = true) (Contains Jump)
-	if gravity_enabled == true:
+	# Jump if gravity_enabled
+	if gravity_enabled == true && is_on_floor:
 		inputDirection.y = -32 / delta * 0.1 if Input.is_action_just_pressed(upInput) else 0
 	
 	vel += inputDirection * delta
@@ -90,16 +98,35 @@ func movePlayer(delta):
 
 # ***
 
-func shootGrapplingHook(grapHookCont : NodePath, grapHookSpwn : NodePath, grapHookScn : String):
+func pointAndShootGrapplingHook(grapHookCont : NodePath, grapHookSpwn : NodePath, grapHookScn : String):
 	
-	if currentGrapplingHook != null:
-		currentGrapplingHook.queue_free()
-	elif currentGrapplingHook == null:
-		currentGrapplingHook = load(grapplingHookScene).instantiate()
-		get_node(grapplingHookContainer).add_child(currentGrapplingHook)
-		currentGrapplingHook.global_position = get_node("GrapplingHookGun/GrapplingHookSpawnpoint").global_position
-		#currentGrapplingHook.global_position = get_global_mouse_position()
-		currentGrapplingHook.player = self
+	# Rotates gun at mouse
+	$GrapplingHookGun.look_at(get_global_mouse_position())
+	
+	# If player shoots...
+	if Input.is_action_just_pressed("shoot"):
+		
+		# If the current grappling hook is an object, destroy it
+		if currentGrapplingHook != null:
+			
+			currentGrapplingHook.queue_free()
+			
+		
+		# If there isn't a current grappling hook, make a new one at the gun's tip
+		elif currentGrapplingHook == null:
+			
+			currentGrapplingHook = load(grapplingHookScene).instantiate()
+			
+			get_node(grapplingHookContainer).add_child(currentGrapplingHook)
+			
+			currentGrapplingHook.global_position = get_node("GrapplingHookGun/GrapplingHookSpawnpoint").global_position
+			#currentGrapplingHook.global_position = get_global_mouse_position()
+			
+			currentGrapplingHook.get_node("GrapplingHookSprite").rotation = $GrapplingHookGun.rotation
+			
+			currentGrapplingHook.player = self
+			
+		pass
 	
 	pass
 
@@ -122,8 +149,30 @@ func collisionChecks(delta, test_mode : bool = false):
 				vel = vel.slide(collisionData.get_normal()) + collisionData.get_collider().constant_linear_velocity * delta
 				pass
 			
-			#print("Returned vel = " + str(vel))
+			var collisionNormalAngle : float = rad_to_deg(collisionData.get_normal().angle())
 			
+			if collisionNormalAngle > -90 - floor_max_angle && collisionNormalAngle < -90 + floor_max_angle:
+				is_on_floor = true
+			else: is_on_floor = false
+			
+			if collisionNormalAngle > 0 - (90 - floor_max_angle) && collisionNormalAngle < 0 + (90 - floor_max_angle):
+				is_on_wall = true
+			elif collisionNormalAngle > 180 - (90 - floor_max_angle) && collisionNormalAngle < 180 + (90 - floor_max_angle):
+				is_on_wall = true
+			else: is_on_wall = false
+			
+			if collisionNormalAngle > 90 - floor_max_angle && collisionNormalAngle < 90 + floor_max_angle:
+				is_on_ceiling = true
+			else: is_on_ceiling = false
+			
+			print("Rotation of normal of collision is: " + str(rad_to_deg(collisionData.get_normal().angle())))
+			
+			pass
+		
+		else:
+			is_on_floor = false
+			is_on_wall = false
+			is_on_ceiling = false
 			pass
 		
 		pass
@@ -153,7 +202,7 @@ func collisionChecks(delta, test_mode : bool = false):
 
 # ***
 
-func swingOnGrapplingHook(delta):
+func swingOnGrapplingHook():
 	if currentGrapplingHook != null:
 		if abs((position - currentGrapplingHook.position).length()) > grapplingHookLength:
 			#position += Vector2(grapplingHookLength - (position - currentGrapplingHook.position).length(), 0).rotated((position - currentGrapplingHook.position).angle())

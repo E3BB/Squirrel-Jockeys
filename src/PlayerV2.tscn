@@ -16,7 +16,7 @@ rightInput = "right"
 grapplingHookSpawnpoint = NodePath("GrapplingHookGun/GrapplingHookSpawnpoint")
 grapplingHookContainer = NodePath("../GrapplingHookContainer")
 grapplingHookScene = "res://src/GrapplingHook.tscn"
-grapplingHookLength = 50.0
+grapplingHookLength = 100.0
 
 [node name="PlayerSprite" type="Sprite2D" parent="."]
 texture = ExtResource("2_8wtqy")
