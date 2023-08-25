@@ -1,0 +1,122 @@
+[gd_scene load_steps=11 format=3 uid="uid://deftmtvyg4abj"]
+
+[ext_resource type="PackedScene" uid="uid://dqf8m0kon4bhu" path="res://src/PlayerV2.tscn" id="2_r0f5p"]
+[ext_resource type="Script" path="res://src/MovableBase.gd" id="3_k8djk"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_oex3l"]
+size = Vector2(256, 20)
+
+[sub_resource type="Animation" id="Animation_cx0be"]
+resource_name = "E"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.4, 0.5, 0.9),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 0,
+"values": [Vector2(0, 100), Vector2(0, 12), Vector2(0, 12), Vector2(0, 100)]
+}
+
+[sub_resource type="Animation" id="Animation_xywo8"]
+resource_name = "Idle"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector2(-159, 27), Vector2(-159, 27)]
+}
+
+[sub_resource type="Animation" id="Animation_ljaj8"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(0, 12)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_c2rob"]
+_data = {
+"E": SubResource("Animation_cx0be"),
+"Idle": SubResource("Animation_xywo8"),
+"RESET": SubResource("Animation_ljaj8")
+}
+
+[sub_resource type="GDScript" id="GDScript_1lbm6"]
+script/source = "extends AnimationPlayer
+
+func _physics_process(_delta):
+	
+	if !is_playing():
+		play(\"E\")
+	
+"
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_yxtcn"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_rcipm"]
+size = Vector2(103, 10)
+
+[node name="Node2D" type="Node2D"]
+
+[node name="PlayerV2" parent="." instance=ExtResource("2_r0f5p")]
+position = Vector2(-78, -60)
+sync_to_physics = false
+gravity_enabled = true
+
+[node name="Camera2D" type="Camera2D" parent="."]
+ignore_rotation = false
+zoom = Vector2(4, 4)
+
+[node name="Platform" type="AnimatableBody2D" parent="."]
+position = Vector2(0, 12)
+sync_to_physics = false
+script = ExtResource("3_k8djk")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platform"]
+shape = SubResource("RectangleShape2D_oex3l")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Platform"]
+autoplay = "E"
+playback_process_mode = 0
+speed_scale = 0.2
+libraries = {
+"": SubResource("AnimationLibrary_c2rob")
+}
+script = SubResource("GDScript_1lbm6")
+
+[node name="TextureRect" type="TextureRect" parent="Platform"]
+offset_left = -128.0
+offset_top = -10.0
+offset_right = 128.0
+offset_bottom = 10.0
+texture = SubResource("PlaceholderTexture2D_yxtcn")
+
+[node name="GrapplingHookContainer" type="Node2D" parent="."]
+
+[node name="MovableBase2D" type="AnimatableBody2D" parent="."]
+script = ExtResource("3_k8djk")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MovableBase2D"]
+position = Vector2(74.5, -30)
+shape = SubResource("RectangleShape2D_rcipm")
+
+[node name="Line2D" type="Line2D" parent="MovableBase2D"]
+points = PackedVector2Array(23, -30, 126, -30)
+default_color = Color(0.196078, 0.721569, 0.831373, 0.576471)

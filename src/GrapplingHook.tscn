@@ -1,0 +1,26 @@
+[gd_scene load_steps=5 format=3 uid="uid://cd6r5772dsptd"]
+
+[ext_resource type="Texture2D" uid="uid://k4b1ywurcsia" path="res://sprs/Hook.png" id="1_3nej4"]
+[ext_resource type="Texture2D" uid="uid://b1qtsabvlfbr" path="res://sprs/RopePart.png" id="2_8v8jm"]
+[ext_resource type="Script" path="res://src/GrapplingHook.gd" id="2_j3vli"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gh78f"]
+size = Vector2(5, 8)
+
+[node name="GrapplingHook" type="AnimatableBody2D" node_paths=PackedStringArray("line2d")]
+script = ExtResource("2_j3vli")
+line2d = NodePath("Rope")
+speed = 0.0
+
+[node name="GrapplingHookSprite" type="Sprite2D" parent="."]
+texture = ExtResource("1_3nej4")
+offset = Vector2(3, 0)
+
+[node name="Rope" type="Line2D" parent="."]
+texture_repeat = 2
+texture = ExtResource("2_8v8jm")
+texture_mode = 1
+
+[node name="GrapplingHookCollisionShape" type="CollisionShape2D" parent="."]
+position = Vector2(4.5, 0)
+shape = SubResource("RectangleShape2D_gh78f")

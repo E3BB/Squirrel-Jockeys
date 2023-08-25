@@ -1,0 +1,33 @@
+[gd_scene load_steps=5 format=3 uid="uid://dqf8m0kon4bhu"]
+
+[ext_resource type="Script" path="res://src/PlayerV2.gd" id="1_qp3sm"]
+[ext_resource type="Texture2D" uid="uid://drp46omper6h7" path="res://sprs/PlayerDemo.png" id="2_8wtqy"]
+[ext_resource type="Texture2D" uid="uid://bi31d7fqyllsk" path="res://sprs/GrapplingHookGun.png" id="3_p8ype"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_f0tt1"]
+size = Vector2(16, 20)
+
+[node name="PlayerV2" type="AnimatableBody2D"]
+script = ExtResource("1_qp3sm")
+upInput = "up"
+downInput = "down"
+leftInput = "left"
+rightInput = "right"
+grapplingHookSpawnpoint = NodePath("GrapplingHookGun/GrapplingHookSpawnpoint")
+grapplingHookContainer = NodePath("../GrapplingHookContainer")
+grapplingHookScene = "res://src/GrapplingHook.tscn"
+grapplingHookLength = 50.0
+
+[node name="PlayerSprite" type="Sprite2D" parent="."]
+texture = ExtResource("2_8wtqy")
+region_rect = Rect2(0, 0, 16, 32)
+
+[node name="PlayerCollisionBody" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_f0tt1")
+
+[node name="GrapplingHookGun" type="Sprite2D" parent="."]
+texture = ExtResource("3_p8ype")
+offset = Vector2(13, 0)
+
+[node name="GrapplingHookSpawnpoint" type="Marker2D" parent="GrapplingHookGun"]
+position = Vector2(17, -1)
