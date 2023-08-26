@@ -19,6 +19,7 @@ offset = Vector2(3, 0)
 
 [node name="Rope" type="Line2D" parent="."]
 texture_repeat = 2
+width = 4.0
 texture = ExtResource("2_8v8jm")
 texture_mode = 1
 

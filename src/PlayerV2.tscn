@@ -9,6 +9,7 @@ size = Vector2(16, 20)
 
 [node name="PlayerV2" type="AnimatableBody2D"]
 script = ExtResource("1_qp3sm")
+gravity_enabled = true
 upInput = "up"
 downInput = "down"
 leftInput = "left"
@@ -17,6 +18,7 @@ grapplingHookSpawnpoint = NodePath("GrapplingHookGun/GrapplingHookSpawnpoint")
 grapplingHookContainer = NodePath("../GrapplingHookContainer")
 grapplingHookScene = "res://src/GrapplingHook.tscn"
 grapplingHookLength = 100.0
+reelSpeed = 8.0
 
 [node name="PlayerSprite" type="Sprite2D" parent="."]
 texture = ExtResource("2_8wtqy")
@@ -31,3 +33,5 @@ offset = Vector2(13, 0)
 
 [node name="GrapplingHookSpawnpoint" type="Marker2D" parent="GrapplingHookGun"]
 position = Vector2(17, -1)
+
+[node name="CoyoteTimeContainer" type="Node2D" parent="."]
