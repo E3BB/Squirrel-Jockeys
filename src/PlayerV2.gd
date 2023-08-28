@@ -29,18 +29,14 @@ extends MovableBase2D
 
 # ** Private Variables **
 var inputDirection : Vector2
+var collisionData : KinematicCollision2D
+var playerHasJumped : bool = true
 
 var is_on_floor : bool
-
 var is_on_wall : bool
-
 var is_on_ceiling : bool
 
-var collisionData : KinematicCollision2D
-
 var currentGrapplingHook : AnimatableBody2D
-
-var o = 0
 
 var is_climb_hook_pressed : bool = false
 
@@ -94,8 +90,9 @@ func movePlayer(delta):
 		inputDirection.y *= 16
 	
 	# Jump if gravity_enabled
-	if gravity_enabled == true && is_on_floor:
-		inputDirection.y = -jumpStrength / delta * 0.1 if Input.is_action_just_pressed(upInput) else 0
+	if gravity_enabled == true && is_on_floor && playerHasJumped == false && Input.is_action_just_pressed(upInput):
+		inputDirection.y = -jumpStrength / delta * 0.1
+		playerHasJumped = true
 	
 	vel += inputDirection * delta
 	vel.y += gravity * delta if gravity_enabled else 0
@@ -126,11 +123,14 @@ func pointAndShootGrapplingHook(grapHookCont : NodePath, grapHookSpwn : NodePath
 			get_node(grapplingHookContainer).add_child(currentGrapplingHook)
 			
 			currentGrapplingHook.global_position = get_node("GrapplingHookGun/GrapplingHookSpawnpoint").global_position
-			#currentGrapplingHook.global_position = get_global_mouse_position()
-			
-			currentGrapplingHook.get_node("GrapplingHookSprite").rotation = $GrapplingHookGun.rotation
-			
+			currentGrapplingHook.rotation = $GrapplingHookGun.rotation
+			currentGrapplingHook.get_node("Rope").rotation = -$GrapplingHookGun.rotation
 			currentGrapplingHook.player = self
+			currentGrapplingHook.startingVel = vel
+			currentGrapplingHook.maxRopeLength = maxRopeLength
+			currentGrapplingHook.gravity = gravity
+			if currentGrapplingHook.rotation == $GrapplingHookGun.rotation:
+				currentGrapplingHook.rotation_matches.emit()
 			
 		pass
 	
@@ -156,12 +156,13 @@ func collisionChecks(delta, test_mode : bool = false):
 				pass
 			
 			
-			# Updates is_on_floor, wall & ceiling bools
+			# Updates for is_on_floor, wall & ceiling bools
 			var collisionNormalAngle : float = rad_to_deg(collisionData.get_normal().angle())
 			
 			if collisionNormalAngle > -90 - floor_max_angle && collisionNormalAngle < -90 + floor_max_angle:
 				is_on_floor = true
 				playerJumpCoyoteTimer = playerJumpCoyoteTime
+				playerHasJumped = false
 			else: playerJumpCoyoteTimer -= delta
 			
 			if collisionNormalAngle > 0 - (90 - floor_max_angle) && collisionNormalAngle < 0 + (90 - floor_max_angle):
@@ -216,27 +217,36 @@ func collisionChecks(delta, test_mode : bool = false):
 
 func swingOnGrapplingHook(delta):
 	
+	# Excess rope = Length of grappling hook - Distance btwn player and grappling hook
 	var excessRope = grapplingHookLength - (position - currentGrapplingHook.position).length()
 	
+	# If there is a hook...
 	if currentGrapplingHook != null:
 		
+		# If rope is stretched too far...
 		if abs((position - currentGrapplingHook.position).length()) > grapplingHookLength:
 			
+			# Move player by excess rope pointed towards grappling hook...
 			move_and_collide(Vector2(excessRope, 0).rotated((position - currentGrapplingHook.position).angle()))
+			# then slide the velocity perpendicular to the player-grappling-hook line
 			vel = vel.slide((position - currentGrapplingHook.position).normalized())
 			
 			pass
 		
 		pass
 	
+	# Set climb button state b/c mouse wheel is weird
 	if Input.is_action_just_pressed("climb_rope"): is_climb_hook_pressed = true
 	if Input.is_action_just_released("climb_rope"): is_climb_hook_pressed = false
 	
+	# Let go of rope if pressed, unless at end of rope
 	if Input.is_action_pressed("loose_rope"): grapplingHookLength = maxRopeLength
 	if Input.is_action_just_released("loose_rope"): grapplingHookLength = (position - currentGrapplingHook.position).length()
 	
+	# Make sure length is between 0 and max rope length
 	grapplingHookLength = clamp(grapplingHookLength, 0, maxRopeLength)
 	
+	# Climb the hook if button is pressed
 	if is_climb_hook_pressed: grapplingHookLength = (position - currentGrapplingHook.position).length() - reelSpeed * delta
 	
 	pass

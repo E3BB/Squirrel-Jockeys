@@ -4,14 +4,17 @@
 [ext_resource type="Texture2D" uid="uid://b1qtsabvlfbr" path="res://sprs/RopePart.png" id="2_8v8jm"]
 [ext_resource type="Script" path="res://src/GrapplingHook.gd" id="2_j3vli"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_gh78f"]
-size = Vector2(5, 8)
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_jwnhr"]
+radius = 2.5
+height = 8.0
 
 [node name="GrapplingHook" type="AnimatableBody2D" node_paths=PackedStringArray("line2d")]
+collision_layer = 16
+collision_mask = 45
 sync_to_physics = false
 script = ExtResource("2_j3vli")
 line2d = NodePath("Rope")
-speed = 512.0
+speed = 64.0
 
 [node name="GrapplingHookSprite" type="Sprite2D" parent="."]
 texture = ExtResource("1_3nej4")
@@ -25,4 +28,4 @@ texture_mode = 1
 
 [node name="GrapplingHookCollisionShape" type="CollisionShape2D" parent="."]
 position = Vector2(4.5, 0)
-shape = SubResource("RectangleShape2D_gh78f")
+shape = SubResource("CapsuleShape2D_jwnhr")

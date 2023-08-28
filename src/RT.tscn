@@ -83,10 +83,11 @@ jumpStrength = 40
 playerJumpCoyoteTime = 0.15
 playerJumpCoyoteTimer = 0.0
 reelSpeed = 256.0
+maxRopeLength = 250.0
 
 [node name="Camera2D2" type="Camera2D" parent="PlayerV2"]
 ignore_rotation = false
-zoom = Vector2(3.5, 3.5)
+zoom = Vector2(2.2, 2.2)
 
 [node name="Camera2D" type="Camera2D" parent="."]
 visible = false
