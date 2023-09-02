@@ -154,12 +154,13 @@ func collisionChecks(delta, test_mode : bool = false):
 			elif collisionData.get_collider().get("constant_linear_velocity") != null:
 				vel = vel.slide(collisionData.get_normal()) + collisionData.get_collider().constant_linear_velocity * delta
 				pass
+			else: vel = vel.slide(collisionData.get_normal())
 			
 			
 			# Updates for is_on_floor, wall & ceiling bools
 			var collisionNormalAngle : float = rad_to_deg(collisionData.get_normal().angle())
 			
-			if collisionNormalAngle > -90 - floor_max_angle && collisionNormalAngle < -90 + floor_max_angle:
+			if compareRangeF(collisionNormalAngle, -90 - floor_max_angle, -90 + floor_max_angle):
 				is_on_floor = true
 				playerJumpCoyoteTimer = playerJumpCoyoteTime
 				playerHasJumped = false

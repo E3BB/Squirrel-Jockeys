@@ -11,9 +11,15 @@ config_version=5
 [application]
 
 config/name="Squirrel Jockeys"
-run/main_scene="res://src/RT.tscn"
+run/main_scene="res://src/TestScene.tscn"
 config/features=PackedStringArray("4.0", "GL Compatibility")
+boot_splash/image="res://sprs/TitleScreen.png"
+boot_splash/use_filter=false
 config/icon="res://icon.svg"
+
+[autoload]
+
+RootScript="*res://src/RootScript.gd"
 
 [display]
 

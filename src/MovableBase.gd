@@ -14,3 +14,12 @@ func _physics_process(delta):
 	prev_frame_pos = position
 	
 	pass
+
+
+func compareRangeF(num : float, i : float, ii : float):
+	
+	if num < ii && num > i:
+		return true
+	else: return false
+	
+	pass

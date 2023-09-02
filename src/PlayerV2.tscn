@@ -26,7 +26,7 @@ reelSpeed = 8.0
 texture = ExtResource("2_8wtqy")
 region_rect = Rect2(0, 0, 16, 32)
 
-[node name="PlayerCollisionBody" type="CollisionShape2D" parent="."]
+[node name="PlayerCollisionBody" type="CollisionShape2D" parent="." groups=["movingColliders"]]
 shape = SubResource("RectangleShape2D_f0tt1")
 
 [node name="GrapplingHookGun" type="Sprite2D" parent="."]
